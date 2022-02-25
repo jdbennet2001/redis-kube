@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:6.2.3-alpine
+        command: ["redis-server"]
+        args: ["/etc/redis/redis.conf"]
+        ports:
+        # Listen on port 6379
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        # 0.5 GB of disk space here...
+        - name: data
+          mountPath: /data
+        # Config Map -> /etc/redis/redis.conf
+        - name: config
+          mountPath: /etc/redis/
+      volumes:
+      # Empty directory, removed when pod is cleaned up
+      - name: redis-config
+        emptyDir: {}
+      # Config map (redis-config), data at <mountPath>/<data>
+      - name: config
+        configMap:
+          name: redis-config
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-storage"
+      resources:
+        requests:
+          storage: 500Mi
