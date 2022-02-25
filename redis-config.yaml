@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data:
+  redis.conf: |
+   
+    # Listen on port 6379
+    port 6379
+
+    # Close the connection after a client is idle for N seconds (0 to disable)
+    timeout 0
+  
+    # Force redis to log on the standard output. 
+    logfile ""
+
+    # Show an ASCII art logo in startup logs by setting the following option to yes.
+    always-show-logo yes
+
+    # Save DB on disk every five seconds or 1 change (not reasonable production values)
+    save 5 1
+
+    # The filename where to dump the DB
+    dbfilename "dump.rdb"
+
+
+    # The working directory.
+    #
+    # The DB will be written inside this directory, with the filename specified
+    # above using the 'dbfilename' configuration directive.
+    #
+    # The Append Only File will also be created inside this directory.
+    #
+    # Note that you must specify a directory here, not a file name.
+    dir "/data"
+
+
+    ############################## MEMORY MANAGEMENT ################################
+
+    # Set a memory usage limit to the specified amount of bytes.
+    # When the memory limit is reached Redis will try to remove keys
+    # according to the eviction policy selected (see maxmemory-policy).
+    maxmemory 32000000
+
+    # MAXMEMORY POLICY: how Redis will select what to remove when maxmemory is reached
+    maxmemory-policy allkeys-lru
